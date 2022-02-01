@@ -22,6 +22,7 @@ import itertools
 import warnings
 from collections import OrderedDict
 from collections.abc import MutableMapping
+from typing import Generator, Union
 
 import numpy as np
 from openff.units import unit
@@ -888,18 +889,33 @@ class Topology(Serializable):
         return n_particles
 
     @property
-    def particles(self):
+    def particles(self) -> Generator[Union[Atom, VirtualParticle], None, None]:
         """
-        Returns an iterator over the particles (Atoms and VirtualParticles) in this Topology. The
+        Returns a generator over the particles (Atoms and VirtualParticles) in this Topology. The
         particles will be in order of ascending Topology index.
 
         Returns
         --------
-        particles : Iterable of Atom and VirtualParticle
+        particles : Generator of Atom or VirtualParticle
         """
         for molecule in self.molecules:
             for atom in molecule.atoms:
                 yield atom
+        for molecule in self.molecules:
+            for vs in molecule.virtual_sites:
+                for vp in vs.particles:
+                    yield vp
+
+    @property
+    def virtual_particles(self) -> Generator[VirtualParticle, None, None]:
+        """
+        Returns a generator over the virtual particles (i.e. VirtualParticles, no Atoms) in
+        this Topology. The virtual particles will be in order of ascending Topology index.
+
+        Returns
+        --------
+        particles : Generator of VirtualParticle
+        """
         for molecule in self.molecules:
             for vs in molecule.virtual_sites:
                 for vp in vs.particles:

@@ -36,12 +36,11 @@ from collections import OrderedDict, UserDict
 from copy import deepcopy
 from typing import TYPE_CHECKING, List, Optional, Union
 
+import mendeleev
 import networkx as nx
 import numpy as np
-import mendeleev
 from mendeleev import element
 from mendeleev.fetch import fetch_table
-
 from openff.units import unit
 from openff.units.openmm import to_openmm
 
@@ -723,8 +722,12 @@ class VirtualParticle(Particle):
 
         return unit.Quantity(position, units=atom_positions_unit)
 
-    def _extract_position_from_conformer(self, conformation):
-
+    def _extract_position_from_conformer(
+        self, conformation: unit.Quantity
+    ) -> unit.Quantity:
+        """
+        Extracts the position of all atomms associated with this particle from a conformation.
+        """
         indices = [atom.molecule_atom_index for atom in self.virtual_site.atoms]
 
         atom_positions = [conformation[i] for i in indices]
@@ -740,7 +743,7 @@ class VirtualParticle(Particle):
 
         return conformer
 
-    def compute_position_from_conformer(self, conformer_idx):
+    def compute_position_from_conformer(self, conformer_idx: int):
         """
         Compute the position of this virtual particle given an existing
         conformer owned by the parent molecule/virtual site.
@@ -7259,8 +7262,9 @@ def _atom_nums_to_hill_formula(atom_nums: List[int]) -> str:
     Hill formula. See https://en.wikipedia.org/wiki/Chemical_formula#Hill_system"""
     from collections import Counter
 
-    atom_symbol_counts = Counter(_ATOMIC_NUMBERS_TO_ELEMENTS[atom_num].symbol
-                                 for atom_num in atom_nums)
+    atom_symbol_counts = Counter(
+        _ATOMIC_NUMBERS_TO_ELEMENTS[atom_num].symbol for atom_num in atom_nums
+    )
 
     formula = []
     # Check for C and H first, to make a correct hill formula
