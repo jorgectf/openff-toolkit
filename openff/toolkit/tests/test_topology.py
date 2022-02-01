@@ -16,7 +16,25 @@ import pytest
 from openff.units import unit
 from openmm import app
 
-from openff.toolkit.tests.create_molecules import *
+from openff.toolkit.tests.create_molecules import (
+    create_cyclohexane,
+    create_dinitrogen,
+    create_ethanol,
+    create_reversed_ethanol,
+    cyx,
+    cyx_hierarchy_perceived,
+    cyx_residues_perceived,
+    dipeptide,
+    dipeptide_hierarchy_perceived,
+    dipeptide_residues_perceived,
+    ethane_from_smiles,
+    ethane_from_smiles_w_vsites,
+    ethene_from_smiles,
+    propane_from_smiles,
+    propane_from_smiles_w_vsites,
+    tip5_water,
+    toluene_from_sdf,
+)
 from openff.toolkit.tests.utils import (
     get_data_file_path,
     requires_openeye,
@@ -354,6 +372,25 @@ class TestTopology:
 
         # There are four virtual sites -- Two BondCharges with 2 atoms, and two MonovalentLonePairs with 3 atoms
         assert n_equal_atoms == 10
+
+    def test_topology_particle_iterators(self):
+        """Test the basic behavior of Topology.particles and topology.virtualParticles"""
+        molecule = create_dinitrogen()
+        nitrogens = [atom for atom in molecule.atoms if atom.atomic_number == 7]
+        molecule.add_bond_charge_virtual_site(
+            (nitrogens[0], nitrogens[1]),
+            0.1 * unit.angstrom,
+            charge_increments=[0.1, 0.05] * unit.elementary_charge,
+        )
+
+        topology = molecule.to_topology()
+
+        for virtual_particle in topology.virtual_particles:
+            assert isinstance(virtual_particle, VirtualParticle)
+            assert not isinstance(virtual_particle, Atom)
+
+        for virtual_particle in topology.particles:
+            assert isinstance(virtual_particle, (VirtualParticle, Atom))
 
     def test_topology_particles_virtualsites_indexed_last(
         self, ethane_from_smiles_w_vsites, propane_from_smiles_w_vsites

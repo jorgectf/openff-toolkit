@@ -22,7 +22,7 @@ import itertools
 import warnings
 from collections import OrderedDict
 from collections.abc import MutableMapping
-from typing import Generator, Union
+from typing import TYPE_CHECKING, Generator, Union
 
 import numpy as np
 from openff.units import unit
@@ -46,6 +46,9 @@ from openff.toolkit.utils.toolkits import (
     DEFAULT_AROMATICITY_MODEL,
     GLOBAL_TOOLKIT_REGISTRY,
 )
+
+if TYPE_CHECKING:
+    from openff.toolkit.topology.molecule import Atom, VirtualParticle
 
 # =============================================================================================
 # PRIVATE SUBROUTINES
@@ -889,7 +892,7 @@ class Topology(Serializable):
         return n_particles
 
     @property
-    def particles(self) -> Generator[Union[Atom, VirtualParticle], None, None]:
+    def particles(self) -> Generator[Union["Atom", "VirtualParticle"], None, None]:
         """
         Returns a generator over the particles (Atoms and VirtualParticles) in this Topology. The
         particles will be in order of ascending Topology index.
@@ -907,7 +910,7 @@ class Topology(Serializable):
                     yield vp
 
     @property
-    def virtual_particles(self) -> Generator[VirtualParticle, None, None]:
+    def virtual_particles(self) -> Generator["VirtualParticle", None, None]:
         """
         Returns a generator over the virtual particles (i.e. VirtualParticles, no Atoms) in
         this Topology. The virtual particles will be in order of ascending Topology index.
