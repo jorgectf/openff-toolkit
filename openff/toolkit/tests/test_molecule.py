@@ -56,7 +56,6 @@ from openff.toolkit.topology.molecule import (
     HierarchySchemeNotFoundException,
     HierarchySchemeWithIteratorNameAlreadyRegisteredException,
     InvalidAtomMetadataError,
-    InvalidConformerError,
     Molecule,
     SmilesParsingError,
 )

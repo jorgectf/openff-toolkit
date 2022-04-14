@@ -44,14 +44,12 @@ from openff.units.openmm import to_openmm
 
 if TYPE_CHECKING:
     from openff.toolkit.topology._mm_molecule import _SimpleAtom, _SimpleMolecule
-    import networkx as nx
     from openff.units.unit import Quantity
 
 from cached_property import cached_property
 from packaging import version
 
 import openff.toolkit
-from openff.toolkit.utils import get_data_file_path, requires_package
 from openff.toolkit.utils.exceptions import (
     HierarchySchemeNotFoundException,
     HierarchySchemeWithIteratorNameAlreadyRegisteredException,
@@ -75,6 +73,7 @@ from openff.toolkit.utils.toolkits import (
 from openff.toolkit.utils.utils import (
     MissingDependencyError,
     dict_to_quantity,
+    get_data_file_path,
     quantity_to_dict,
     requires_package,
 )
@@ -5578,7 +5577,6 @@ class FrozenMolecule(Serializable):
 
         with open(substructure_file_path, "r") as subfile:
             substructure_dictionary = json.load(subfile)
-        from openmm.app import PDBFile
 
         pdb = PDBFile(file_path)
         omm_topology_G = _openmm_topology_to_networkx(
